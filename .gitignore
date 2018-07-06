@@ -1,0 +1,14 @@
+.*
+dist/
+build/*
+app/
+!build/icons
+node_modules/
+npm-debug.log
+npm-debug.log.*
+thumbs.db
+!.gitkeep
+!.gitignore
+
+#idea
+*.iml
