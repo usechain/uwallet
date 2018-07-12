@@ -1,4 +1,7 @@
-# usewallet
+# uwallet
+
+The official Usechain wallet for Macos, Windows and Linux. 
+(Under developing ...)
 
 <p align="center"><a href="https://usechain.net" target="_blank" rel="noopener noreferrer"><img width="100" src="https://www.usechain.net/static/img/logo.png" alt="Usechain logo"></a></p>
 
@@ -36,7 +39,6 @@ make android
 
 # build ios app (todo)
 make ios
-
 
 ```
 

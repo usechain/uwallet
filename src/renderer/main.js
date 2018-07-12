@@ -5,6 +5,9 @@ import App from './App'
 import router from './router'
 import store from './store'
 
+//require("./js/pkcs10/pkcs10.js")
+//const usechain = require("./js/usechain.js")
+
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
