@@ -53,10 +53,22 @@ function new_wallet(password) {
         n: 8192
     });
 
+    // set the default account
+    web3.eth.defaultAccount = newwallet.address()
     //TODO: save to local file
     return keystore;
 }
 
+// web3 eth function
+// callWeb3EthFunc("getBalance('0x1234')")
+function callWeb3EthFunc(func){
+    return eval("web3.eth."+func)
+}
+
+//return the balance, BigNumber in Wei  of addr.
+function getBalance(addr) {
+    return web3.eth.getBalance(addr)
+}
 //download js object
 function download(data) {
     //data = JSON.stringify(Obj);
@@ -76,21 +88,7 @@ function download(data) {
     //fake_click(save_link);
 }
 
-//send transaction
-function sendtx(tx) {
-    console.log("sendtx")
 
-    web3.eth.sendSignedTransaction(tx, function (err, hash) {
-        if (!err) {
-            console.log("transaction hash:" + hash);
-            return hash;
-
-        } else {
-            console.log(err);
-            return false;
-        }
-    });
-}
 
 function outputObj(obj) {
     var des = "";
@@ -200,7 +198,7 @@ function fmtData(funcDigest, ...args) {
     return data
 }
 
-
+// default param
 var _txParams = {
         nonce:0,  //should be filled by caller
         gasPrice: '0x3B9ACA00',//1Gwei
@@ -228,14 +226,22 @@ var _txParams = {
 // @param args: smart contract arguments to form data
 //_pubKey, _sign, _CA
 function sendAddr(wallet, params, funcDigest, ...args) {
-    var nonce = web3.eth.getTransactionCount(wallet.getAddressString(), 'pending')
 
     var p = _txParams
+
+    if (!params.to) throw new Error("send to address is empty")
+    p.to = params.to
+
+    if(!web3.isAddress(p.to)) {
+        throw new Error("send to address is illegal")
+    }
+
+    var nonce = web3.eth.getTransactionCount(wallet.getAddressString(), 'pending')
+
     p.nonce = nonce
     if (params.gasPrice) p.gasPrice = params.gasPrice;
     if (params.gasLimit) p.gasLimit = params.gasLimit;
-    if (!params.to) throw new Error("send to address is empty")
-    p.to = params.to
+
     if (params.value) p.value = params.value
     if (params.chainId) p.chainId = params.chainId;
     if (params.data) {
@@ -251,7 +257,21 @@ function sendAddr(wallet, params, funcDigest, ...args) {
     var serializedTx = signTx(wallet, tx)
     sendTx(serializedTx)
 }
+/*
+ @param params The transaction object to send:
+ from: String - The address for the sending account. Uses the web3.eth.defaultAccount property, if not specified.
+ to: String - (optional) The destination address of the message, left undefined for a contract-creation transaction.
+ value: Number|String|BigNumber - (optional) The value transferred for the transaction in Wei, also the endowment if it's a contract-creation transaction.
+ gas: Number|String|BigNumber - (optional, default: To-Be-Determined) The amount of gas to use for the transaction (unused gas is refunded).
+ gasPrice: Number|String|BigNumber - (optional, default: To-Be-Determined) The price of gas for this transaction in wei, defaults to the mean network gas price.
+ data: String - (optional) Either a byte string containing the associated data of the message, or in the case of a contract-creation transaction, the initialisation code.
+ nonce: Number - (optional) Integer of a nonce. This allows to overwrite your own pending transactions that use the same nonce.
+ @return string,the 32 Bytes transaction hash as HEX string.
+ */
+function sendTransaction(params) {
+    web3.geth.sendTransaction(params);
 
+}
 // sign  transaction
 function signTx(wallet, tx) {
     const privateKey = wallet.getPrivateKey()

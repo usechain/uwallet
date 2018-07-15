@@ -52,7 +52,7 @@
             sendTransaction(){
                 var wallet = init();
                 //function sendAddr(wallet, to, params, funcDigest, ...args)
-                var to = "0xa9213f4994ced932bbd39d14b582cd9e1fa3cd0e"
+                var to = "0xee518396c5c9f0b0afa94e13246cf8f2eab13fe9"
                 var params = {
 
                     chainId: 555,
@@ -66,6 +66,13 @@
             newWallet(){
                 var keystore = new_wallet("123456")
                 console.log(keystore)
+            },
+            getBalance() {
+                var balance = getBalance("0xd5780e8fce7c7d0e1e5fdb4742a7e2aa57cc7694")
+                console.log("balance:"+balance)
+            },
+            sendTransaction(to,value){
+                sendTransaction()
             },
              csr(){
                  function arrayBufferToHex(buf) {
