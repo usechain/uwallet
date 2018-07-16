@@ -22,9 +22,11 @@
                     <br><br>
                 </div>
                 <div>
-                    <button @click="sendTransaction()">sendTransaction</button>
+                    <button @click="sendContract()">sendContract</button>
                     <button @click="newWallet()">new Wallet</button>
                     <button @click="csr()">csr req</button>
+                    <button @click="getBalance()">get balance</button>
+                    <button @click="sendTransaction({to:'0x2d9401b01e5d8dadc50a1e508af8459dbe6eb151',value:100000000})">sendTransaction</button>
                 </div>
                 <div class="doc">
                     <div class="title alt">white paper</div>
@@ -49,7 +51,7 @@
             open (link) {
                 this.$electron.shell.openExternal(link)
             },
-            sendTransaction(){
+            sendContract(){
                 var wallet = init();
                 //function sendAddr(wallet, to, params, funcDigest, ...args)
                 var to = "0xee518396c5c9f0b0afa94e13246cf8f2eab13fe9"
@@ -60,7 +62,7 @@
                     //data:data
                 }
 
-                sendAddr(wallet, params, "0xfdf03f86", "123435476598987093287453875487", "def", "zzzzzzzzba57c85fa41a3bb00c9fcddf8506246f1ab3c445ba016a8b35147e5c951f4ddd0f6cf0b204525cf59af81fb24273accf0b204525cf59af81fb24273cf0b204525cf59af81fb24273eb74242de824dxyz");
+                sendContract(wallet, params, "0xfdf03f86", "123435476598987093287453875487", "def", "zzzzzzzzba57c85fa41a3bb00c9fcddf8506246f1ab3c445ba016a8b35147e5c951f4ddd0f6cf0b204525cf59af81fb24273accf0b204525cf59af81fb24273cf0b204525cf59af81fb24273eb74242de824dxyz");
 
             },
             newWallet(){
@@ -71,8 +73,15 @@
                 var balance = getBalance("0xd5780e8fce7c7d0e1e5fdb4742a7e2aa57cc7694")
                 console.log("balance:"+balance)
             },
-            sendTransaction(to,value){
-                sendTransaction()
+            sendTransaction(params){
+                var params={
+                    to:params.to,
+                    chainId: 555,
+                    value:params.value
+
+                }
+
+                sendTransaction(params)
             },
              csr(){
                  function arrayBufferToHex(buf) {

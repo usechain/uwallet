@@ -11,7 +11,7 @@
 "use strict";
 //var cfg =require( "./config.js");
 var cfg= {
-    "usthost": "http://192.168.3.6:8545"
+    "usthost": "http://192.168.3.5:8545"
 }
 //var Web3 = require( './web3j/web3.js');
 
@@ -25,7 +25,7 @@ function log(){
 }
 
 //init
-function init() {
+(function init() {
 
     if(!web3.currentProvider) {
         web3.setProvider(new web3.providers.HttpProvider(cfg.usthost));
@@ -41,7 +41,7 @@ function init() {
     console.log("wallet address:"+wallet.getAddressString())
     console.log("usechain.js init successfull")
     return wallet
-}
+})()
 
 // new wallet
 function new_wallet(password) {
@@ -214,7 +214,7 @@ var _txParams = {
         data:"0x00",
 }
 
-// send user Addr to committee
+// send request to contract address
 // @param wallet
 // @param to: receiver
 // @param pamrms.gasPrice
@@ -225,7 +225,7 @@ var _txParams = {
 // @param funcDigest: smart contract function digest,8 bytes with '0x'
 // @param args: smart contract arguments to form data
 //_pubKey, _sign, _CA
-function sendAddr(wallet, params, funcDigest, ...args) {
+function sendContract(wallet, params, funcDigest, ...args) {
 
     var p = _txParams
 
@@ -269,7 +269,37 @@ function sendAddr(wallet, params, funcDigest, ...args) {
  @return string,the 32 Bytes transaction hash as HEX string.
  */
 function sendTransaction(params) {
-    web3.geth.sendTransaction(params);
+
+    var p = _txParams
+
+    if (!params.to) throw new Error("send to address is empty")
+    p.to = params.to
+
+    if(!web3.isAddress(p.to)) {
+        throw new Error("send to address is illegal:"+p.to)
+    }
+
+    var nonce = web3.eth.getTransactionCount(wallet.getAddressString(), 'pending')
+
+    p.nonce = nonce
+    if (params.gasPrice) p.gasPrice = params.gasPrice;
+    if (params.gasLimit) p.gasLimit = params.gasLimit;
+
+    if (params.value) p.value = params.value
+    if (params.chainId) p.chainId = params.chainId;
+    if (params.data) {
+        p.data = params.data
+    }
+    if (params.value) {
+        p.value = params.value
+    }
+    console.log("p.to:"+p.to)
+    console.log("p.value:"+p.value)
+
+    const tx = new Tx(p)
+
+    var serializedTx = signTx(wallet, tx)
+    sendTx(serializedTx)
 
 }
 // sign  transaction
