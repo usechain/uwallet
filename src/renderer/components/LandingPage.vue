@@ -25,6 +25,7 @@
                     <button @click="sendContract()">sendContract</button>
                     <button @click="newWallet()">new Wallet</button>
                     <button @click="csr()">csr req</button>
+                    <button @click="sendRingSig()">ring sign</button>
                     <button @click="getBalance()">get balance</button>
                     <button @click="sendTransaction({to:'0x2d9401b01e5d8dadc50a1e508af8459dbe6eb151',value:100000000})">sendTransaction</button>
                 </div>
@@ -43,11 +44,35 @@
 
 <script>
     import SystemInformation from './LandingPage/SystemInformation'
+    import global_ from '../Global'
+    import axios from 'axios'
 
     export default {
         name: 'landing-page',
         components: {SystemInformation},
         methods: {
+
+                postRequest(url, params) {
+                    return new Promise((resolve, reject) => {
+                        this.http({
+                                method: 'post',
+                                url: url,
+                                data: {
+                                    params
+                                }
+                            }
+                            //{emulateJSON: false}
+                        ).then((res) => {    //成功胡回调
+                            resolve(res.body);
+                        })
+                            .catch((res) => {   //失败的回掉
+                                reject(res.body);
+                            });
+                    });
+
+                    //postRequest:postRequest
+                },
+
             open (link) {
                 this.$electron.shell.openExternal(link)
             },
@@ -83,6 +108,25 @@
 
                 sendTransaction(params)
             },
+            sendRingSig(){
+                /*
+                 * @param {Kyber.Curve} suite - the crypto suite used for the sign process
+                 * @param {Uint8Array} message - the message to be signed
+                 * @param {Array} anonymitySet - an array containing the public keys of the group
+                 * @param [linkScope] - ths link scope used for linkable signature
+                 * @param {Integer} mine - the index of the public key of the signer in the anonymity set
+                 * @param {Uint8Array} privateKey - the private key of the signer
+                 * @return {Uint8Array} - the signature
+                 */
+
+                var params={
+                    message, anonymitySet, linkScope, mine, privateKey
+
+
+                }
+                sendRingSig(params);
+
+            },
              csr(){
                  function arrayBufferToHex(buf) {
                      var hex = "";
@@ -94,32 +138,48 @@
                      }
                      return hex;
                  }
+
                 async function createCSR() {
 //                    var id = document.getElementById("idnumber");
 //                    var hashAlg = document.getElementById("hashAlg");
 //                    var signAlg = document.getElementById("signAlg");
 //                    var result = document.getElementById("pem-text-block");
-                    var hash = await genKeyHash("12342354346543", "sha-256");
+                    //var hash = await genKeyHash("12342354346543", "sha-256");
+                    var hash = await genKeyHash("12342354346543", "sha-1");
                     // Promise.all([hashPromise]).then(v=console.log("hash"))
                     var config={}
                     config.commonName = arrayBufferToHex(hash)
 
                     //testabc()
                     config.hashAlg = "SHA-256";
-                    config.signAlg = "RSASSA-PKCS1-v1_5";
+                    //config.signAlg = "RSASSA-PKCS1-v1_5";
+                    config.signAlg = "RSA-PSS";
                     config.countryName="China"
                     config.organizationName="Usechain"
                     config.organizationalUnitName="Usechain bj"
                     config.stateOrProvinceName="beijing"
                     config.email="zhouhh@usechain.net"
 
+                    let v=""
 
                     var pemPromise = createPKCS10PEM(config)
-                    pemPromise.then((value) => {console.log(value)
+                    pemPromise.then((value) => {
+                    let url= "http://localhost:8081/user/auth1"
+                    //let    params={csrstr:value,hashid:hash}
+                    let    params={csrstr:value}
                     console.log("csr:\n"+value);
+                    v=value
+                            var qs=require('qs');
+                            var instance = axios.create({
+                                headers: {'content-type': 'application/x-www-form-urlencoded'}
+                            });
+                            instance.post(url, qs.stringify(params)).then(res => res.data);
+
+                            return value
                     },
                     error =>console.error(error)
-                    )
+                    ).then(v)
+
 
                 }
                  createCSR();

@@ -21882,10 +21882,11 @@
 	{
 		return Promise.resolve().then(() => createPKCS10Internal(config)).then(() =>
 		{
-			let resultString = "-----BEGIN CERTIFICATE REQUEST-----\r\n";
+			let resultString = "-----BEGIN CERTIFICATE REQUEST-----\n";
 			resultString = `${resultString}${formatPEM(toBase64(arrayBufferToString(pkcs10Buffer)))}`;
-			resultString = `${resultString}\r\n-----END CERTIFICATE REQUEST-----\r\n`;
-			
+			resultString = `${resultString}\n-----END CERTIFICATE REQUEST-----\n`;
+			console.log(pkcs10Buffer)
+			console.log(arrayBufferToString(pkcs10Buffer))
 			return resultString
 		});
 	}

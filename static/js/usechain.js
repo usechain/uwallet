@@ -15,6 +15,9 @@ var cfg= {
 }
 //var Web3 = require( './web3j/web3.js');
 
+const Kyber = require("@dedis/kyber-js");
+const suite = new Kyber.curve.edwards25519.Curve;
+const RingSig = require("./ringsig");
 var web3 = new Web3();
 
 let wallet
@@ -256,6 +259,28 @@ function sendContract(wallet, params, funcDigest, ...args) {
 
     var serializedTx = signTx(wallet, tx)
     sendTx(serializedTx)
+}
+
+function sendRingSig(params) {
+    let X = [];
+    for (let i = 0; i < 3; i++) {
+        X.push(suite.point().pick())
+    }
+
+    let mine1 = 1;
+    let x1 = suite.scalar().pick();
+    X[mine1] = suite.point().mul(x1);
+
+    //let M = Uint8Array.from([1, 2, 3, 4]);
+    //let S = Uint8Array.from([5, 6, 7, 8]);
+    return RingSig.Sign(suite, M, X, S, mine1, x1);
+}
+/*
+@return boolean true or false.
+ */
+function verify(params) {
+    let value = RingSig.Verify(suite, M, X, S, sig);
+    return value.valid;
 }
 /*
  @param params The transaction object to send:
