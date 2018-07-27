@@ -22,12 +22,14 @@
                     <br><br>
                 </div>
                 <div>
-                    <button @click="sendContract()">sendContract</button>
-                    <button @click="newWallet()">new Wallet</button>
-                    <button @click="csr()">csr req</button>
-                    <button @click="sendRingSig()">ring sign</button>
-                    <button @click="getBalance()">get balance</button>
-                    <button @click="sendTransaction({to:'0x2d9401b01e5d8dadc50a1e508af8459dbe6eb151',value:100000000})">sendTransaction</button>
+                    <button @click="sendOneTimeAddr()">一次性地址链上注册(sendOneTimeAddr)</button>
+                    <button @click="queryAddr()">查询地址是否已通过(queryAddr)</button>
+                    <button @click="sendRingSig()">环签名(ring signature)</button>
+
+                    <button @click="getBalance()">查询余额(get balance)</button>
+                    <button @click="sendTransaction({to:'0x2d9401b01e5d8dadc50a1e508af8459dbe6eb151',value:100000000})">转账(sendTransaction)</button>
+                    <button @click="newWallet()">新钱包(new wallet)</button>
+                    <button @click="csr()">发送认证请求(csr request)</button>
                 </div>
                 <div class="doc">
                     <div class="title alt">white paper</div>
@@ -76,7 +78,7 @@
             open (link) {
                 this.$electron.shell.openExternal(link)
             },
-            sendContract(){
+            sendOneTimeAddr(){
                 var wallet = init();
                 //function sendAddr(wallet, to, params, funcDigest, ...args)
                 var to = "0xee518396c5c9f0b0afa94e13246cf8f2eab13fe9"

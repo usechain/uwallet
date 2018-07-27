@@ -1,7 +1,7 @@
 /**
  * Created by zhouhh on 2018/7/7.
  */
-require('../../static/js/pkcs10.js');
+/*require('../static/js/pkcs10/pkcs10.js');
 var certificate = {
     hostname: 'hostname',
     country: "china",
@@ -13,4 +13,5 @@ var certificate = {
     keysize: '256'
 }
 
-make_csr(certificate,null);
+
+make_csr(certificate,null);*/

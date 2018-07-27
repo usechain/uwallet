@@ -11,16 +11,21 @@
 "use strict";
 //var cfg =require( "./config.js");
 var cfg= {
-    "usthost": "http://192.168.3.5:8545"
+    "usthost": "http://192.168.3.5:8545",
+    "usthost2":"http://192.168.3.6:8555"
 }
-//var Web3 = require( './web3j/web3.js');
 
-const Kyber = require("@dedis/kyber-js");
+var Web3 = require("web3");
+const axios = require("axios")
+const Kyber = require("@usechain/kyberjs");
 const suite = new Kyber.curve.edwards25519.Curve;
 const RingSig = require("./ringsig");
+//const Wallet = require("./web3j/wallet-browser.js");
+const Wallet = require("ethereumjs-wallet");
 var web3 = new Web3();
+var wallet//=new Wallet()
 
-let wallet
+
 const z64 = "0000000000000000000000000000000000000000000000000000000000000000"
 function log(){
     //alert("hello")
@@ -28,7 +33,7 @@ function log(){
 }
 
 //init
-(function init() {
+function init() {
 
     if(!web3.currentProvider) {
         web3.setProvider(new web3.providers.HttpProvider(cfg.usthost));
@@ -40,11 +45,12 @@ function log(){
         console.log("web3 connect success")
     }
 
-    wallet = Wallet.fromPrivateKey(Buffer.from('4ac8a6c0effc132f35f77803d50e94e8d4ffde41cd500d81db2d1a5e89dd4ac3', 'hex'));
+    var wallet = Wallet.fromPrivateKey(Buffer.from('4ac8a6c0effc132f35f77803d50e94e8d4ffde41cd500d81db2d1a5e89dd4ac3', 'hex'));
     console.log("wallet address:"+wallet.getAddressString())
     console.log("usechain.js init successfull")
     return wallet
-})()
+}
+
 
 // new wallet
 function new_wallet(password) {
@@ -261,19 +267,44 @@ function sendContract(wallet, params, funcDigest, ...args) {
     sendTx(serializedTx)
 }
 
-function sendRingSig(params) {
-    let X = [];
-    for (let i = 0; i < 3; i++) {
-        X.push(suite.point().pick())
+//["0xf1d6989953539237a690efdb2656cf19c04a9322", 5, "latest"]
+function getPublicKey(params=undefined) {
+    if(!params) {
+        params=["0xf1d6989953539237a690efdb2656cf19c04a9322", 5, "latest"]
     }
+    let request={
+        jsonrpc: "2.0",
+        method: "eth_getPublicKeySet",
+        params: params,
+        id: 1
+    }
+    var qs=require('qs');
+    var instance = axios.create({
+        headers: {'content-type': 'application/json'}
+    });
+    instance.post(cfg.usthost2, qs.stringify(params)).then(res => res.data);
 
-    let mine1 = 1;
-    let x1 = suite.scalar().pick();
-    X[mine1] = suite.point().mul(x1);
 
-    //let M = Uint8Array.from([1, 2, 3, 4]);
-    //let S = Uint8Array.from([5, 6, 7, 8]);
-    return RingSig.Sign(suite, M, X, S, mine1, x1);
+}
+function sendRingSig(params) {
+
+
+    getPublicKey().then(keys=>{
+        let X = [];
+        for (let i = 0; i < 3; i++) {
+            X.push(suite.point().pick())
+        }
+
+        let mine1 = 1;
+        let x1 = suite.scalar().pick();
+        X[mine1] = suite.point().mul(x1);
+
+        //let M = Uint8Array.from([1, 2, 3, 4]);
+        //let S = Uint8Array.from([5, 6, 7, 8]);
+        return RingSig.Sign(suite, M, X, S, mine1, x1);
+
+    })
+
 }
 /*
 @return boolean true or false.

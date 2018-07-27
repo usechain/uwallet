@@ -1,8 +1,9 @@
 /**
  * Created by zhouhh on 2018/7/8.
  */
-import sendtx from  "../js/usechain.js"
-var tcert=getTcert();
+var sendtx = require( "../static/js/usechain.js")
+var tcert="";
+var level=0;
 const txParams = {
     nonce: 0,
     gasPrice: '0x3B9ACA00',
@@ -21,4 +22,4 @@ const txParams = {
     // chainId: 3
 }
 
-sendtx(txParams);
+//sendtx(txParams);

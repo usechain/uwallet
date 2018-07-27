@@ -3,9 +3,28 @@
  */
 "use strict";
 
-const Kyber = require("@dedis/kyber-js");
+const Kyber = require("./kyber");
+
 const Blake = require("@stablelib/blake2xs").BLAKE2Xs;
+var createKeccakHash = require('keccak');
 const cloneDeep = require("lodash.clonedeep");
+var assert = require('assert');
+var rlp = require('rlp');
+var BN = require('bn.js');
+var createHash = require('create-hash');
+var Buffer = require('safe-buffer').Buffer;
+Object.assign(exports, require('ethjs-util'));
+//var etherjswallet = require("ethereumjs-wallet")
+var ethUtil = require('ethereumjs-util')
+
+/**
+ * Creates  SHA-3 Keccak hash of the input
+ * @param {Buffer|Array|String|Number} a the input data
+ * @param {Number} [bits=256] the Keccak SHA width
+ * @return {Buffer}
+ */
+var sha3=ethUtil.sha3
+
 
 /**
  * @typedef {Object} SignatureVerification
@@ -51,14 +70,14 @@ function Sign(suite, message, anonymitySet, linkScope, mine, privateKey) {
     let L = anonymitySet.slice(0);
     let pi = mine;
 
-    let linkBase;
-    let linkTag;
-
-    if (linkScope !== undefined) {
-        let linkStream = new Blake(undefined, {key: linkScope});
-        linkBase = suite.point().pick(createStreamFromBlake(linkStream));
-        linkTag = suite.point().mul(privateKey, linkBase);
-    }
+    // let linkBase;
+    // let linkTag;
+    //
+    // if (linkScope !== undefined) {
+    //     let linkStream = new Blake(undefined, {key: linkScope});
+    //     linkBase = suite.point().pick(createStreamFromBlake(linkStream));
+    //     linkTag = suite.point().mul(privateKey, linkBase);
+    // }
 
     let H1pre = signH1pre(suite, linkScope, linkTag, message);
 
@@ -134,13 +153,9 @@ function Verify(suite, message, anonymitySet, linkScope, signatureBuffer) {
         linkScope !== undefined
     );
 
-    if (linkScope !== undefined) {
-        let linkStream = new Blake(undefined, {key: linkScope});
-        linkBase = suite.point().pick(createStreamFromBlake(linkStream));
-        linkTag = sig.Tag;
-    }
 
-    let H1pre = signH1pre(suite, linkScope, linkTag, message);
+
+    let H1pre = signH3(suite, message);
 
     let P, PG, PH;
     P = suite.point();
