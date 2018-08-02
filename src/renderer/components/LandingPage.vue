@@ -22,6 +22,7 @@
                     <br><br>
                 </div>
                 <div>
+                    <button @click="init()">初始化</button>
                     <button @click="sendOneTimeAddr()">一次性地址链上注册(sendOneTimeAddr)</button>
                     <button @click="queryAddr()">查询地址是否已通过(queryAddr)</button>
                     <button @click="sendRingSig()">环签名(ring signature)</button>
@@ -53,7 +54,9 @@
         name: 'landing-page',
         components: {SystemInformation},
         methods: {
-
+                init(){
+                    init()
+                },
                 postRequest(url, params) {
                     return new Promise((resolve, reject) => {
                         this.http({

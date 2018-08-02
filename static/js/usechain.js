@@ -11,19 +11,19 @@
 "use strict";
 //var cfg =require( "./config.js");
 var cfg= {
-    "usthost": "http://192.168.3.5:8545",
-    "usthost2":"http://192.168.3.6:8555"
+    "usthost": "http://118.190.146.199:8545",
+    "usthost2":"http://usechain.cn:8555"
 }
 
 var Web3 = require("web3");
 const axios = require("axios")
 const Kyber = require("@usechain/kyberjs");
 const suite = new Kyber.curve.edwards25519.Curve;
-const RingSig = require("./ringsig");
+//const RingSig = require("./ringsig");
 //const Wallet = require("./web3j/wallet-browser.js");
-const Wallet = require("ethereumjs-wallet");
+//const Wallet = require("ethereumjs-wallet");
 var web3 = new Web3();
-var wallet//=new Wallet()
+var wallet //= new Wallet()
 
 
 const z64 = "0000000000000000000000000000000000000000000000000000000000000000"
@@ -45,7 +45,7 @@ function init() {
         console.log("web3 connect success")
     }
 
-    var wallet = Wallet.fromPrivateKey(Buffer.from('4ac8a6c0effc132f35f77803d50e94e8d4ffde41cd500d81db2d1a5e89dd4ac3', 'hex'));
+    wallet = Wallet.fromPrivateKey(Buffer.from('4ac8a6c0effc132f35f77803d50e94e8d4ffde41cd500d81db2d1a5e89dd4ac3', 'hex'));
     console.log("wallet address:"+wallet.getAddressString())
     console.log("usechain.js init successfull")
     return wallet
@@ -364,8 +364,7 @@ function signTx(wallet, tx) {
 
     tx.sign(privateKey)
     const serializedTx = tx.serialize()
-    console.log(serializedTx.toString('hex'));
-    console.log(serializedTx.toString());
+    console.log("signed and serialized transaction:"+serializedTx.toString('hex'));
     return serializedTx;
 
 }

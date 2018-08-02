@@ -4,6 +4,6 @@
 
 module.exports = {
     config: {
-        "usthost": "http://192.168.3.6:8545"
+        "usthost": "http://118.190.146.199:8545"
     }
 }
